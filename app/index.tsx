@@ -2,6 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
+import { useWeatherCurrent } from "@/hooks/useWeatherApi";
+import { IWeather } from "@/types/weather";
 
 const deviceWidth = Dimensions.get("window").width;
 
@@ -34,6 +36,9 @@ export default function Index() {
   const [location, setLocation] = useState<
     Location.LocationGeocodedAddress[] | null
   >(null);
+  const [weather, setWeather] = useState<IWeather | null>(null);
+  const getWeatherCurrent = useWeatherCurrent;
+  const [days, setDays] = useState();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,6 +50,8 @@ export default function Index() {
       } else {
         const { latitude, longitude } = await getPositionAsync();
         const getLocation = await getReverseGeoCode(latitude, longitude);
+        const weathers = await getWeatherCurrent(latitude, longitude);
+        setWeather(weathers);
         setLocation(getLocation);
       }
     }
@@ -74,6 +81,7 @@ export default function Index() {
         <View style={styles.day}>
           <Text style={styles.temp}>27</Text>
           <Text style={styles.desc}>Sunny</Text>
+          <Text>{weather ? JSON.stringify(weather) : null}</Text>
         </View>
         <View style={styles.day}>
           <Text style={styles.temp}>27</Text>
